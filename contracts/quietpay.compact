@@ -136,7 +136,7 @@ export circuit proveIncomeAtLeast(
     "amount/salt do not match the published commitment"
   );
 
-  return amt >= threshold;
+  return disclose(amt >= threshold);
 }
 
 // ----------------------------------------------------------------------
