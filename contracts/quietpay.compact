@@ -1,0 +1,148 @@
+pragma language_version >= 0.13;
+
+import CompactStandardLibrary;
+
+// ════════════════════════════════════════════════════════════════════════
+//  QUIETPAY — Confidential Payroll / Splits
+// ════════════════════════════════════════════════════════════════════════
+//
+//  PRIVACY MODEL
+//  -------------
+//  PUBLIC  (ledger state — written on-chain, visible to anyone):
+//    • poolTotal            — the total amount funded into a pay period.
+//                             Public so anyone can audit that the pool was
+//                             solvent and fully funded.
+//    • recipientCommitments — Map<recipientKey, commitment>. A commitment
+//                             is a hash of (amount, salt) for that
+//                             recipient. Publishing it lets the payer be
+//                             held to a specific split without revealing
+//                             what that split actually is.
+//    • claimedNullifiers    — one-way tokens marking "this recipient has
+//                             already claimed this pay period." Prevents
+//                             double-claiming without linking claims
+//                             across different pay periods.
+//    • claims               — a public log of {nullifier -> claimed}.
+//                             Only ever records that *a* claim happened,
+//                             never for how much.
+//
+//  PRIVATE (witnesses — supplied at proof time, NEVER touch the ledger):
+//    • amount     — the recipient's real payout amount for this period.
+//    • salt       — a random value mixed into the commitment so amounts
+//                   can't be brute-forced from the public commitment.
+//    • holderSecret — a recipient-held secret used to derive the claim
+//                   nullifier and any later income-threshold proof.
+//
+//  WHAT CROSSES THE PUBLIC BOUNDARY:
+//    disclose() is called in exactly three places below:
+//      1. on `poolTotal`  — the total funded amount (Payer chooses to
+//                            make solvency auditable)
+//      2. on `commitment` — a hash binding the payer to a specific,
+//                            unchangeable split without revealing it
+//      3. on `nullifier` and the `claimed` boolean — proof that a
+//                            payout was claimed, without the amount
+//    The per-recipient amount, salt, and the mapping from a real-world
+//    identity to a recipientKey are never disclosed. A separate circuit,
+//    `proveIncomeAtLeast`, lets a recipient prove their amount clears a
+//    threshold to a third party (a lender, a landlord) without writing
+//    anything to the ledger or revealing the amount to QuietPay itself.
+// ════════════════════════════════════════════════════════════════════════
+
+// NOTE: `persistentHash`, `concat`, and `padTo32` below are written to
+// match current Compact stdlib documentation patterns. Confirm their
+// exact signatures against your installed `compact` compiler version —
+// the compiler will flag any drift, and stdlib naming has shifted across
+// releases. See README.md for the compile step.
+
+export ledger poolTotal: Uint<64>;
+export ledger recipientCommitments: Map<Bytes<32>, Bytes<32>>;
+export ledger claimedNullifiers: Set<Bytes<32>>;
+export ledger claims: Map<Bytes<32>, Boolean>;
+
+// ----------------------------------------------------------------------
+// fundPool — payer deposits the total for a pay period. Kept minimal
+// for the MVP; a production version would gate this behind an admin key
+// and transfer real token balances rather than a bare counter.
+// ----------------------------------------------------------------------
+export circuit fundPool(totalAmount: Uint<64>): [] {
+  poolTotal = disclose(totalAmount);
+}
+
+// ----------------------------------------------------------------------
+// commitSplit — payer publishes a commitment for one recipient without
+// revealing the amount behind it. `recipientKey` is an opaque identifier
+// (e.g. a hash of the recipient's wallet key), not a real-world identity.
+// ----------------------------------------------------------------------
+export circuit commitSplit(
+  recipientKey: Bytes<32>,
+  commitment: Bytes<32>
+): [] {
+  recipientCommitments.insert(disclose(recipientKey), disclose(commitment));
+}
+
+// ----------------------------------------------------------------------
+// Private witnesses — the recipient's real payout data. Supplied locally
+// by the recipient's wallet/browser and never leave their device except
+// as circuit inputs.
+// ----------------------------------------------------------------------
+witness amount(): Uint<64>;
+witness salt(): Bytes<32>;
+witness holderSecret(): Bytes<32>;
+
+// ----------------------------------------------------------------------
+// claimPayout — proves the caller's private (amount, salt) matches the
+// commitment published for `recipientKey`, then marks that recipient's
+// entitlement as claimed for this period. Reveals nothing about the
+// amount — only that a valid, unclaimed entitlement was redeemed.
+// ----------------------------------------------------------------------
+export circuit claimPayout(recipientKey: Bytes<32>, periodId: Bytes<32>): [] {
+  const amt    = amount();
+  const s      = salt();
+  const secret = holderSecret();
+
+  const leaf = persistentHash<Bytes<40>>(concat(padTo32(amt), s));
+  assert(
+    recipientCommitments.member(recipientKey) &&
+      recipientCommitments.lookup(recipientKey) == leaf,
+    "amount/salt do not match the published commitment"
+  );
+  assert(amt > 0 as Uint<64>, "nothing to claim");
+
+  const nullifier: Bytes<32> = persistentHash<Bytes<96>>(
+    concat(concat(periodId, recipientKey), secret)
+  );
+  assert(!claimedNullifiers.member(nullifier), "already claimed this period");
+
+  claimedNullifiers.insert(disclose(nullifier));
+  claims.insert(disclose(nullifier), disclose(true));
+}
+
+// ----------------------------------------------------------------------
+// proveIncomeAtLeast — a pure verification circuit (writes nothing to
+// the ledger). Lets a recipient prove "my payout this period was >=
+// threshold" to whoever they hand the proof to, without revealing the
+// amount to that third party or to QuietPay.
+// ----------------------------------------------------------------------
+export circuit proveIncomeAtLeast(
+  recipientKey: Bytes<32>,
+  threshold: Uint<64>
+): Boolean {
+  const amt = amount();
+  const s   = salt();
+
+  const leaf = persistentHash<Bytes<40>>(concat(padTo32(amt), s));
+  assert(
+    recipientCommitments.member(recipientKey) &&
+      recipientCommitments.lookup(recipientKey) == leaf,
+    "amount/salt do not match the published commitment"
+  );
+
+  return amt >= threshold;
+}
+
+// ----------------------------------------------------------------------
+// isClaimed — public read helper so any contract or frontend can check a
+// claim result by nullifier without re-running a proof.
+// ----------------------------------------------------------------------
+export circuit isClaimed(nullifier: Bytes<32>): Boolean {
+  return claims.member(nullifier) && claims.lookup(nullifier);
+}

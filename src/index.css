@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════════════════
+   QUIETPAY DESIGN TOKENS
+   Concept: a vault, not a seal. Cool graphite steel with a verdigris
+   (weathered copper) accent — the material language of a strongroom
+   ledger rather than a notarized document. Distinct from a "crypto
+   dashboard" neon palette on purpose.
+   ══════════════════════════════════════════════════════════════════════ */
+@theme {
+  --color-slate-950: #0f1214;
+  --color-slate-900: #171b1f;
+  --color-slate-800: #1f252b;
+  --color-slate-700: #2b323a;
+  --color-slate-600: #3d4650;
+
+  --color-ledger-100: #eef0ea;
+  --color-ledger-200: #e2e5da;
+  --color-ledger-300: #cdd2c0;
+
+  --color-patina-400: #7fb39a;
+  --color-patina-500: #5e9c81;
+  --color-patina-600: #457a64;
+
+  --color-copper-500: #c08a4e;
+  --color-clay-500: #b8543f;
+
+  --color-text-hi: #e9ece6;
+  --color-text-mid: #a7ada6;
+  --color-text-low: #6c7169;
+
+  --font-display: "Newsreader", "Iowan Old Style", serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-slate-950);
+  color: var(--color-text-hi);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-patina-500);
+  color: var(--color-slate-950);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-patina-400);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Fine dial-plate rings behind the hero vault mark */
+.vault-rings {
+  background-image: repeating-radial-gradient(
+    circle at center,
+    transparent 0px,
+    transparent 26px,
+    var(--color-slate-700) 27px
+  );
+}
+
+/* Subtle grain on the public ledger panel, echoing pressed steel */
+.steel-grain {
+  background-image: radial-gradient(var(--color-slate-700) 0.6px, transparent 0.6px);
+  background-size: 14px 14px;
+}
