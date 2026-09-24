@@ -154,8 +154,13 @@ async function main() {
   try {
     const CompiledContractClass = await getCompiledContract();
     
+    const witnessesModule = await import('../../contracts/dist/index.js');
+    const { CompiledContract } = await import('@midnight-ntwrk/midnight-js-protocol/compact-js');
+    
+    const contractWithWitnesses = CompiledContract.withWitnesses(witnessesModule.witnesses)(CompiledContractClass as any);
+    
     const deployed = await deployContract(providers, {
-        compiledContract: CompiledContractClass as any,
+        compiledContract: contractWithWitnesses as any,
         args: []
     });
     
