@@ -30,7 +30,7 @@ import * as Rx from 'rxjs';
 
 async function main() {
   console.log("Starting deployment to Preprod...");
-  const seed = process.env.WALLET_SEED || "myth useful toy raven march sunset glare jealous feed human glide right exist ghost thunder master peasant check smoke garlic boost candy flame arch";
+  const seed = process.env.WALLET_SEED || "929dff99d9387db318b3bc54add98c5ce4fcc3386445a224e3332fe19a429610";
   if (!seed) throw new Error("WALLET_SEED environment variable is required");
   
   const config = new PreprodRemoteConfig();
