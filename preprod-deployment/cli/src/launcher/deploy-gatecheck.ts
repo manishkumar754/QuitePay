@@ -13,13 +13,7 @@ import { deployContract } from '@midnight-ntwrk/midnight-js-contracts';
 import * as contractModule from '@midnight-ntwrk/bboard-contract';
 
 async function getCompiledContract() {
-  const exports = Object.values(contractModule);
-  for (const exp of exports) {
-    if (exp && typeof exp === 'object' && 'contractName' in exp) {
-      return exp;
-    }
-  }
-  return (contractModule as any).CompiledContract || (contractModule as any).CompiledBboardContract || (contractModule as any).CompiledQuietpayContract;
+  return (contractModule as any).CompiledBBoardContractContract || (contractModule as any).CompiledQuietpayContractContract || (contractModule as any).CompiledContractContract;
 }
 import { createLogger } from '../logger-utils.js';
 import { getUnshieldedAddress } from '../wallet-utils.js';
