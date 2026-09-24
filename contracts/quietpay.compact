@@ -101,8 +101,8 @@ export circuit claimPayout(recipientKey: Bytes<32>, periodId: Bytes<32>): [] {
 
   const leaf = persistentHash<Vector<2, Bytes<32>>>([persistentHash<Uint<64>>(amt), s]);
   assert(
-    recipientCommitments.member(recipientKey) &&
-      recipientCommitments.lookup(recipientKey) == leaf,
+    recipientCommitments.member(disclose(recipientKey)) &&
+      recipientCommitments.lookup(disclose(recipientKey)) == leaf,
     "amount/salt do not match the published commitment"
   );
   assert(amt > 0 as Uint<64>, "nothing to claim");
@@ -110,7 +110,7 @@ export circuit claimPayout(recipientKey: Bytes<32>, periodId: Bytes<32>): [] {
   const nullifier: Bytes<32> = persistentHash<Vector<3, Bytes<32>>>([
     periodId, recipientKey, secret
   ]);
-  assert(!claimedNullifiers.member(nullifier), "already claimed this period");
+  assert(!claimedNullifiers.member(disclose(nullifier)), "already claimed this period");
 
   claimedNullifiers.insert(disclose(nullifier));
   claims.insert(disclose(nullifier), disclose(true));
@@ -131,8 +131,8 @@ export circuit proveIncomeAtLeast(
 
   const leaf = persistentHash<Vector<2, Bytes<32>>>([persistentHash<Uint<64>>(amt), s]);
   assert(
-    recipientCommitments.member(recipientKey) &&
-      recipientCommitments.lookup(recipientKey) == leaf,
+    recipientCommitments.member(disclose(recipientKey)) &&
+      recipientCommitments.lookup(disclose(recipientKey)) == leaf,
     "amount/salt do not match the published commitment"
   );
 
@@ -144,5 +144,5 @@ export circuit proveIncomeAtLeast(
 // claim result by nullifier without re-running a proof.
 // ----------------------------------------------------------------------
 export circuit isClaimed(nullifier: Bytes<32>): Boolean {
-  return claims.member(nullifier) && claims.lookup(nullifier);
+  return claims.member(disclose(nullifier)) && claims.lookup(disclose(nullifier));
 }
