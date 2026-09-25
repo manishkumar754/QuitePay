@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import wasmPlugin from "vite-plugin-wasm"
-import topLevelAwaitPlugin from "vite-plugin-top-level-await"
 import path from "path"
 
 const wasm = (wasmPlugin as any).default || wasmPlugin;
