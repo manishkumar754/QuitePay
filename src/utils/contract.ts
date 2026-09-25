@@ -36,7 +36,6 @@ export interface IncomeProofInput {
   threshold: number;
 }
 
-let cachedProviders: any = null;
 let deployedContract: any = null;
 
 export const CONTRACT_ADDRESS = "ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3";
@@ -137,8 +136,6 @@ async function getContract() {
     midnightProvider: walletProvider,
   };
   
-  cachedProviders = providers;
-  
   const { CompiledBBoardContractContract, witnesses } = await import("@midnight-ntwrk/bboard-contract");
   const { CompiledContract } = await import("@midnight-ntwrk/midnight-js-protocol/compact-js");
   const contractWithWitnesses = CompiledContract.withWitnesses(witnesses)(CompiledBBoardContractContract as any);
@@ -185,7 +182,7 @@ export async function proveIncomeAtLeast(input: IncomeProofInput): Promise<{ pas
   const contract = await getContract();
   // Call it as a dry run to just verify the circuit
   try {
-     await contract.callTx.proveIncomeAtLeast(input.recipientKey, input.periodId);
+     await contract.callTx.proveIncomeAtLeast(input.recipientKey);
      return { passes: true };
   } catch(e) {
      return { passes: false };
