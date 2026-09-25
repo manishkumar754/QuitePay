@@ -52,7 +52,6 @@ export async function connectWallet(): Promise<WalletState> {
 }
 
 export async function disconnectWallet(): Promise<void> {
-  cachedProviders = null;
   deployedContract = null;
 }
 
@@ -104,28 +103,28 @@ async function getContract() {
   const walletProvider = {
     getCoinPublicKey: () => walletApi.coinPublicKey,
     getEncryptionPublicKey: () => walletApi.coinPublicKey,
-    balanceTx: async (tx: any) => {
+    balanceTx: async (tx: any): Promise<any> => {
       const serializedTx = toHex(tx.serialize());
       if (typeof activeProvider.balanceUnsealedTransaction === "function") {
         const received = await activeProvider.balanceUnsealedTransaction(serializedTx);
-        return Transaction.deserialize("signature", "proof", "binding", fromHex(received.tx));
+        return Transaction.deserialize("signature", "proof", "binding", fromHex(received.tx)) as any;
       }
       throw new Error("Wallet does not support balanceUnsealedTransaction");
     },
-    proveTx: async (tx: any) => {
+    proveTx: async (tx: any): Promise<any> => {
       const serializedTx = toHex(tx.serialize());
       if (typeof activeProvider.proveUnsealedTransaction === "function") {
         const received = await activeProvider.proveUnsealedTransaction(serializedTx);
-        return Transaction.deserialize("signature", "proof", "binding", fromHex(received.tx));
+        return Transaction.deserialize("signature", "proof", "binding", fromHex(received.tx)) as any;
       }
       throw new Error("Wallet does not support proveUnsealedTransaction");
     },
-    submitTx: async (tx: any) => {
+    submitTx: async (tx: any): Promise<string> => {
       const serializedTx = toHex(tx.serialize());
       const txHash = await activeProvider.submitTransaction(serializedTx);
       return txHash;
     }
-  };
+  } as any;
 
   const providers = {
     privateStateProvider,
@@ -134,15 +133,17 @@ async function getContract() {
     proofProvider,
     walletProvider,
     midnightProvider: walletProvider,
-  };
+  } as any;
   
+  // @ts-ignore
   const { CompiledBBoardContractContract, witnesses } = await import("@midnight-ntwrk/bboard-contract");
+  // @ts-ignore
   const { CompiledContract } = await import("@midnight-ntwrk/midnight-js-protocol/compact-js");
-  const contractWithWitnesses = CompiledContract.withWitnesses(witnesses)(CompiledBBoardContractContract as any);
+  const contractWithWitnesses = CompiledContract.withWitnesses(witnesses as any)(CompiledBBoardContractContract as any);
 
-  deployedContract = await findDeployedContract(providers, {
+  deployedContract = await (findDeployedContract as any)(providers, {
     contractAddress: CONTRACT_ADDRESS,
-    compiledContract: contractWithWitnesses as any,
+    compiledContract: contractWithWitnesses,
   });
 
   return deployedContract;
