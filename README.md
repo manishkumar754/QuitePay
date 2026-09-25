@@ -12,7 +12,7 @@
 
 | Network | Address |
 |---------|---------|
-| Preprod | `[ADDRESS — add after running the deploy command below]` |
+| Preprod | `ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3` |
 
 ## What This Product Does
 
