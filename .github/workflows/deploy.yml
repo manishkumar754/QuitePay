@@ -57,21 +57,12 @@ jobs:
 
 
 
-      - name: Upload Deployment Info
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-info
-          path: |
-            preprod-deployment/cli/deployment.json
-            deployed_contract.json
-
       - name: Commit Artifacts
         if: success()
         run: |
           git config --global user.name 'manishkumar754'
           git config --global user.email 'manishkumar754@users.noreply.github.com'
           git pull origin main
-          git add preprod-deployment/contracts/src/managed deployed_contract.json
+          git add preprod-deployment/contracts/src/managed
           git commit -m "chore: add compiled contract artifacts and deployment info [skip ci]" || echo "No changes to commit"
           git push origin HEAD:${GITHUB_REF}
