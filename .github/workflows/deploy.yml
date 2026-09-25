@@ -55,13 +55,7 @@ jobs:
           sudo swapon /swapfile_extra
           free -h
 
-      - name: Deploy Contract
-        run: |
-          cd preprod-deployment/cli
-          npx tsx src/launcher/deploy-gatecheck.ts
-        env:
-          NODE_OPTIONS: "--max-old-space-size=8192 --expose-gc"
-          WALLET_SEED: ${{ secrets.WALLET_SEED }}
+
 
       - name: Upload Deployment Info
         if: always()
