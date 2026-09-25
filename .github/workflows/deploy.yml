@@ -63,6 +63,6 @@ jobs:
           git config --global user.name 'manishkumar754'
           git config --global user.email 'manishkumar754@users.noreply.github.com'
           git pull origin main
-          git add preprod-deployment/contracts/src/managed
+          git add -f preprod-deployment/contracts/src/managed
           git commit -m "chore: add compiled contract artifacts and deployment info [skip ci]" || echo "No changes to commit"
           git push origin HEAD:${GITHUB_REF}
