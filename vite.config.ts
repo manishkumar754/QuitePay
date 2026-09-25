@@ -6,10 +6,9 @@ import topLevelAwaitPlugin from "vite-plugin-top-level-await"
 import path from "path"
 
 const wasm = (wasmPlugin as any).default || wasmPlugin;
-const topLevelAwait = (topLevelAwaitPlugin as any).default || topLevelAwaitPlugin;
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), wasm(), topLevelAwait()],
+  plugins: [react(), tailwindcss(), wasm()],
   resolve: {
     alias: {
       "isomorphic-ws": path.resolve(__dirname, "mock-ws.js"),
