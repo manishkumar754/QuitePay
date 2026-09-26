@@ -46,17 +46,17 @@ export function PublicLedger({
                 className="rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 flex items-center justify-between gap-4"
               >
                 <div className="min-w-0">
-                  <p className="text-sm text-text-hi truncate">{c.recipientLabel}</p>
-                  <p className="font-mono text-[11px] text-text-low truncate">
-                    key {c.recipientKey.slice(0, 14)}…
+                  <p className="text-sm text-text-hi font-medium mb-1">{c.recipientLabel}</p>
+                  <p className="font-mono text-[10px] text-text-low break-all mb-0.5">
+                    <span className="text-slate-500">key:</span> {c.recipientKey}
                   </p>
                   {c.salt && (
-                    <p className="font-mono text-[11px] text-amber-500 truncate">
-                      salt {c.salt}
+                    <p className="font-mono text-[10px] text-amber-500/90 break-all mb-0.5">
+                      <span className="text-amber-500/50">salt:</span> {c.salt}
                     </p>
                   )}
                 </div>
-                <span className="shrink-0 font-mono text-[11px] text-patina-400">
+                <span className="shrink-0 font-mono text-[11px] text-patina-400 self-start mt-1">
                   {c.commitment.slice(0, 10)}…
                 </span>
               </li>
