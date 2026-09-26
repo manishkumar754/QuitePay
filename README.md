@@ -90,7 +90,7 @@ sequenceDiagram
 
 ---
 
-## User Onboarding Detail
+## Local Setup & Run
 
 ### Prerequisites
 - [Node.js](https://nodejs.org) v20 or later
