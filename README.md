@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="public/vault.svg" alt="QuietPay Logo" width="120" />
+</div>
+
 # Project Title
 **QuietPay**
 ![CI](https://github.com/manishkumar754/QuitePay/actions/workflows/deploy.yml/badge.svg)
