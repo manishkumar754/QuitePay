@@ -43,13 +43,25 @@ export function RecipientPanel({
     const amt = Number(amount);
     if (Number.isNaN(amt)) return;
 
+    const cleanKey = recipientKey.replace(/^key:\s*/, '').replace(/\s+/g, '');
+    const cleanSalt = salt.replace(/^salt:\s*/, '').replace(/\s+/g, '');
+
+    if (cleanKey.length !== 64) {
+      alert(`Recipient key must be exactly 64 characters (you have ${cleanKey.length}). Make sure you copied the whole string from the ledger!`);
+      return;
+    }
+    if (cleanSalt.length !== 64) {
+      alert(`Salt must be exactly 64 characters (you have ${cleanSalt.length}). Make sure you copied the whole string from the ledger!`);
+      return;
+    }
+
     if (mode === "claim") {
-      onClaim({ recipientKey, periodId, amount: amt, salt, holderSecret });
+      onClaim({ recipientKey: cleanKey, periodId, amount: amt, salt: cleanSalt, holderSecret });
     } else {
       onProveIncome({
-        recipientKey,
+        recipientKey: cleanKey,
         amount: amt,
-        salt,
+        salt: cleanSalt,
         threshold: Number(threshold) || 0,
       });
     }
