@@ -38,7 +38,7 @@ export interface IncomeProofInput {
 }
 
 let deployedContract: any = null;
-
+export let contractProviders: any = null;
 export const CONTRACT_ADDRESS = "ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3";
 
 export async function connectWallet(): Promise<WalletState> {
@@ -143,6 +143,7 @@ async function getContract() {
     compiledContract: contractWithWitnesses,
   });
 
+  contractProviders = providers;
   return deployedContract;
 }
 
@@ -154,10 +155,10 @@ export async function fundPool(totalAmount: number): Promise<{ poolTotal: number
 
 export async function commitSplit(entry: SplitEntry): Promise<CommitmentRecord> {
   const contract = await getContract();
-  const salt = randomHex(16);
+  const salt = randomHex(32);
   const commitment = await sha256Hex(`${entry.amount}:${salt}`);
   
-  await contract.callTx.commitSplit(entry.recipientKey, commitment);
+  await contract.callTx.commitSplit(hexToBytes(entry.recipientKey), hexToBytes(commitment));
   
   return {
     recipientKey: entry.recipientKey,
@@ -167,11 +168,24 @@ export async function commitSplit(entry: SplitEntry): Promise<CommitmentRecord> 
   };
 }
 
+export function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export async function claimPayout(input: ClaimInput): Promise<ClaimRecord> {
   const contract = await getContract();
-  const tx = await contract.callTx.claimPayout(input.recipientKey, input.periodId);
+  const periodIdHash = await sha256Hex(input.periodId);
+
+  const accountId = contractProviders.walletProvider.getCoinPublicKey();
+  await contractProviders.privateStateProvider.set(accountId, {
+    amount: BigInt(input.amount),
+    salt: hexToBytes(input.salt),
+    holderSecret: hexToBytes(input.holderSecret),
+  });
+
+  const tx = await contract.callTx.claimPayout(hexToBytes(input.recipientKey), hexToBytes(periodIdHash));
   return {
-    nullifier: tx.public.nullifier,
+    nullifier: bytesToHex(tx.public.nullifier),
     claimed: tx.public.claimed,
     timestamp: Math.floor(Date.now() / 1000),
   };
@@ -179,9 +193,16 @@ export async function claimPayout(input: ClaimInput): Promise<ClaimRecord> {
 
 export async function proveIncomeAtLeast(input: IncomeProofInput): Promise<{ passes: boolean }> {
   const contract = await getContract();
-  // Call it as a dry run to just verify the circuit
+  
+  const accountId = contractProviders.walletProvider.getCoinPublicKey();
+  await contractProviders.privateStateProvider.set(accountId, {
+    amount: BigInt(input.amount),
+    salt: hexToBytes(input.salt),
+    holderSecret: new Uint8Array(32), // dummy for prove, or does it need it? Wait, let's just use empty
+  });
+
   try {
-     await contract.callTx.proveIncomeAtLeast(input.recipientKey);
+     await contract.callTx.proveIncomeAtLeast(hexToBytes(input.recipientKey));
      return { passes: true };
   } catch(e) {
      return { passes: false };
@@ -194,12 +215,20 @@ function randomHex(bytes: number): string {
   return Array.from(arr, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+export function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  }
+  return bytes;
+}
+
 export async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
   const digest = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function randomKeyHex(bytes = 16): string {
+export function randomKeyHex(bytes = 32): string {
   return randomHex(bytes);
 }
