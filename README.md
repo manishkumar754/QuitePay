@@ -146,8 +146,8 @@ income).
 
 ## Product X Profile
 
-[PLACEHOLDER — add after creating the account and posting the launch
-thread]
+[QuietPay X Profile](https://x.com/quietpayS)
+- [Launch Tweet](https://x.com/quietpayS/status/2103888560378277949)
 
 ## Project Structure
 
