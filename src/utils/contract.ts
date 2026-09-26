@@ -144,6 +144,7 @@ async function getContract() {
   deployedContract = await (findDeployedContract as any)(providers, {
     contractAddress: CONTRACT_ADDRESS,
     compiledContract: contractWithWitnesses,
+    privateStateId: CONTRACT_ADDRESS,
   });
 
   contractProviders = providers;
