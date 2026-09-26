@@ -12,11 +12,12 @@ https://quite-pay-iota.vercel.app
 
 [Watch the MVP Demo on Google Drive](https://drive.google.com/file/d/18OfcwmqD3VmO2GF-HplJ--C2U1YneOTs/view?usp=sharing)
 
-## Contract Address
+## Contract Address & Transactions
 
-| Network | Address |
-|---------|---------|
-| Preprod | `ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3` ([Explorer Link](https://preprod.midnightexplorer.com/contracts/0xec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3)) |
+| Network | Address / Transaction |
+|---------|------------------------|
+| Preprod Contract | `ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3` ([Explorer Link](https://preprod.midnightexplorer.com/contracts/0xec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3)) |
+| Example Claim Tx | `9ea4643ffd9ebcdc1a3d45b3c8f3a789810d686c32402965ce811761da6bbc05` ([1AM Explorer](https://explorer.1am.xyz/tx/9ea4643ffd9ebcdc1a3d45b3c8f3a789810d686c32402965ce811761da6bbc05?network=preprod)) |
 
 ## What This Product Does
 
@@ -43,6 +44,23 @@ Midnight is the natural fit because `disclose()` forces every public
 exposure to be a deliberate, auditable choice in the contract code — rather
 than "everything is public unless you build an entire off-chain layer to
 hide it," which is how every other chain handles this problem today.
+
+## App Screenshots
+
+### 1. QuietPay UI
+![Product UI](screenshots/product-ui.png)
+
+### 2. Contract Deployed On-Chain
+![Contract On-Chain](screenshots/contract-onchain.png)
+
+### 3. Public Ledger State
+![Public Ledger](screenshots/public-ledger.png)
+
+### 4. Claiming a Payout (ZK Proof)
+![Claim Payout](screenshots/claim-payout.png)
+
+### 5. CI/CD Pipeline Passing
+![CI/CD Pipeline](screenshots/ci-cd.png)
 
 ## Privacy Model
 
