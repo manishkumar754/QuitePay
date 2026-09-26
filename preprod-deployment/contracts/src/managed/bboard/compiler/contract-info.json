@@ -114,6 +114,63 @@
       "result-type": {
         "type-name": "Boolean"
       }
+    },
+    {
+      "name": "computeCommitment",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "amt",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 18446744073709551615
+          }
+        },
+        {
+          "name": "s",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "computeNullifier",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "periodId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "recipientKey",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "secret",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
     }
   ],
   "witnesses": [

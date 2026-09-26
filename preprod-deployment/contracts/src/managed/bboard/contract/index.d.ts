@@ -37,6 +37,10 @@ export type ProvableCircuits<PS> = {
 }
 
 export type PureCircuits = {
+  computeCommitment(amt_0: bigint, s_0: Uint8Array): Uint8Array;
+  computeNullifier(periodId_0: Uint8Array,
+                   recipientKey_0: Uint8Array,
+                   secret_0: Uint8Array): Uint8Array;
 }
 
 export type Circuits<PS> = {
@@ -52,6 +56,13 @@ export type Circuits<PS> = {
                      threshold_0: bigint): __compactRuntime.CircuitResults<PS, boolean>;
   isClaimed(context: __compactRuntime.CircuitContext<PS>,
             nullifier_0: Uint8Array): __compactRuntime.CircuitResults<PS, boolean>;
+  computeCommitment(context: __compactRuntime.CircuitContext<PS>,
+                    amt_0: bigint,
+                    s_0: Uint8Array): __compactRuntime.CircuitResults<PS, Uint8Array>;
+  computeNullifier(context: __compactRuntime.CircuitContext<PS>,
+                   periodId_0: Uint8Array,
+                   recipientKey_0: Uint8Array,
+                   secret_0: Uint8Array): __compactRuntime.CircuitResults<PS, Uint8Array>;
 }
 
 export type Ledger = {

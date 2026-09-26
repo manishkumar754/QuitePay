@@ -276,6 +276,12 @@ export class Contract {
                                            nullifier_0);
         partialProofData.output = { value: _descriptor_1.toValue(result_0), alignment: _descriptor_1.alignment() };
         return { result: result_0, context: context, proofData: partialProofData, gasCost: context.gasCost };
+      },
+      computeCommitment(context, ...args_1) {
+        return { result: pureCircuits.computeCommitment(...args_1), context };
+      },
+      computeNullifier(context, ...args_1) {
+        return { result: pureCircuits.computeNullifier(...args_1), context };
       }
     };
     this.impureCircuits = {
@@ -380,15 +386,15 @@ export class Contract {
     }
   }
   _persistentHash_0(value_0) {
-    const result_0 = __compactRuntime.persistentHash(_descriptor_3, value_0);
-    return result_0;
-  }
-  _persistentHash_1(value_0) {
     const result_0 = __compactRuntime.persistentHash(_descriptor_4, value_0);
     return result_0;
   }
-  _persistentHash_2(value_0) {
+  _persistentHash_1(value_0) {
     const result_0 = __compactRuntime.persistentHash(_descriptor_2, value_0);
+    return result_0;
+  }
+  _persistentHash_2(value_0) {
+    const result_0 = __compactRuntime.persistentHash(_descriptor_3, value_0);
     return result_0;
   }
   _fundPool_0(context, partialProofData, totalAmount_0) {
@@ -479,7 +485,7 @@ export class Contract {
     const amt_0 = this._amount_0(context, partialProofData);
     const s_0 = this._salt_0(context, partialProofData);
     const secret_0 = this._holderSecret_0(context, partialProofData);
-    const leaf_0 = this._persistentHash_1([this._persistentHash_2(amt_0), s_0]);
+    const leaf_0 = this._persistentHash_0([this._persistentHash_1(amt_0), s_0]);
     __compactRuntime.assert(_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                       partialProofData,
                                                                                       [
@@ -518,7 +524,7 @@ export class Contract {
                                           leaf_0),
                             'amount/salt do not match the published commitment');
     __compactRuntime.assert(amt_0 > 0n, 'nothing to claim');
-    const nullifier_0 = this._persistentHash_0([periodId_0,
+    const nullifier_0 = this._persistentHash_2([periodId_0,
                                                 recipientKey_0,
                                                 secret_0]);
     __compactRuntime.assert(!_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
@@ -577,7 +583,7 @@ export class Contract {
   {
     const amt_0 = this._amount_0(context, partialProofData);
     const s_0 = this._salt_0(context, partialProofData);
-    const leaf_0 = this._persistentHash_1([this._persistentHash_2(amt_0), s_0]);
+    const leaf_0 = this._persistentHash_0([this._persistentHash_1(amt_0), s_0]);
     __compactRuntime.assert(_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                       partialProofData,
                                                                                       [
@@ -653,6 +659,12 @@ export class Contract {
                                                                                                  alignment: _descriptor_0.alignment() } }] } },
                                                                       { popeq: { cached: false,
                                                                                  result: undefined } }]).value);
+  }
+  _computeCommitment_0(amt_0, s_0) {
+    return this._persistentHash_0([this._persistentHash_1(amt_0), s_0]);
+  }
+  _computeNullifier_0(periodId_0, recipientKey_0, secret_0) {
+    return this._persistentHash_2([periodId_0, recipientKey_0, secret_0]);
   }
   _equal_0(x0, y0) {
     if (!x0.every((x, i) => y0[i] === x)) { return false; }
@@ -997,7 +1009,62 @@ const _dummyContract = new Contract({
   salt: (...args) => undefined,
   holderSecret: (...args) => undefined
 });
-export const pureCircuits = {};
+export const pureCircuits = {
+  computeCommitment: (...args_0) => {
+    if (args_0.length !== 2) {
+      throw new __compactRuntime.CompactError(`computeCommitment: expected 2 arguments (as invoked from Typescript), received ${args_0.length}`);
+    }
+    const amt_0 = args_0[0];
+    const s_0 = args_0[1];
+    if (!(typeof(amt_0) === 'bigint' && amt_0 >= 0n && amt_0 <= 18446744073709551615n)) {
+      __compactRuntime.typeError('computeCommitment',
+                                 'argument 1',
+                                 'bboard.compact line 153 char 1',
+                                 'Uint<0..18446744073709551616>',
+                                 amt_0)
+    }
+    if (!(s_0.buffer instanceof ArrayBuffer && s_0.BYTES_PER_ELEMENT === 1 && s_0.length === 32)) {
+      __compactRuntime.typeError('computeCommitment',
+                                 'argument 2',
+                                 'bboard.compact line 153 char 1',
+                                 'Bytes<32>',
+                                 s_0)
+    }
+    return _dummyContract._computeCommitment_0(amt_0, s_0);
+  },
+  computeNullifier: (...args_0) => {
+    if (args_0.length !== 3) {
+      throw new __compactRuntime.CompactError(`computeNullifier: expected 3 arguments (as invoked from Typescript), received ${args_0.length}`);
+    }
+    const periodId_0 = args_0[0];
+    const recipientKey_0 = args_0[1];
+    const secret_0 = args_0[2];
+    if (!(periodId_0.buffer instanceof ArrayBuffer && periodId_0.BYTES_PER_ELEMENT === 1 && periodId_0.length === 32)) {
+      __compactRuntime.typeError('computeNullifier',
+                                 'argument 1',
+                                 'bboard.compact line 157 char 1',
+                                 'Bytes<32>',
+                                 periodId_0)
+    }
+    if (!(recipientKey_0.buffer instanceof ArrayBuffer && recipientKey_0.BYTES_PER_ELEMENT === 1 && recipientKey_0.length === 32)) {
+      __compactRuntime.typeError('computeNullifier',
+                                 'argument 2',
+                                 'bboard.compact line 157 char 1',
+                                 'Bytes<32>',
+                                 recipientKey_0)
+    }
+    if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
+      __compactRuntime.typeError('computeNullifier',
+                                 'argument 3',
+                                 'bboard.compact line 157 char 1',
+                                 'Bytes<32>',
+                                 secret_0)
+    }
+    return _dummyContract._computeNullifier_0(periodId_0,
+                                              recipientKey_0,
+                                              secret_0);
+  }
+};
 export const contractReferenceLocations =
   { tag: 'publicLedgerArray', indices: { } };
 //# sourceMappingURL=index.js.map
