@@ -181,8 +181,7 @@ export async function claimPayout(input: ClaimInput): Promise<ClaimRecord> {
   const contract = await getContract();
   const periodIdHash = await sha256Hex(input.periodId);
 
-  const accountId = contractProviders.walletProvider.getCoinPublicKey();
-  await contractProviders.privateStateProvider.set(accountId, {
+  await contractProviders.privateStateProvider.set(CONTRACT_ADDRESS, {
     amount: BigInt(input.amount),
     salt: hexToBytes(input.salt),
     holderSecret: hexToBytes(input.holderSecret),
@@ -199,8 +198,7 @@ export async function claimPayout(input: ClaimInput): Promise<ClaimRecord> {
 export async function proveIncomeAtLeast(input: IncomeProofInput): Promise<{ passes: boolean }> {
   const contract = await getContract();
   
-  const accountId = contractProviders.walletProvider.getCoinPublicKey();
-  await contractProviders.privateStateProvider.set(accountId, {
+  await contractProviders.privateStateProvider.set(CONTRACT_ADDRESS, {
     amount: BigInt(input.amount),
     salt: hexToBytes(input.salt),
     holderSecret: new Uint8Array(32), // dummy for prove, or does it need it? Wait, let's just use empty
