@@ -8,6 +8,10 @@
 
 https://quite-pay-iota.vercel.app
 
+## Video Demo
+
+[Watch the MVP Demo on Google Drive](https://drive.google.com/file/d/18OfcwmqD3VmO2GF-HplJ--C2U1YneOTs/view?usp=sharing)
+
 ## Contract Address
 
 | Network | Address |
