@@ -139,7 +139,8 @@ async function getContract() {
   const { CompiledBBoardContractContract, witnesses } = await import("@midnight-ntwrk/bboard-contract");
   // @ts-ignore
   const { CompiledContract } = await import("@midnight-ntwrk/midnight-js-protocol/compact-js");
-  const contractWithWitnesses = (CompiledContract.withWitnesses(witnesses as any) as any)(CompiledBBoardContractContract as any);
+  // @ts-ignore
+  const contractWithWitnesses = CompiledContract.withWitnesses(witnesses)(CompiledBBoardContractContract);
 
   deployedContract = await (findDeployedContract as any)(providers, {
     contractAddress: CONTRACT_ADDRESS,
