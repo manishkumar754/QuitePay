@@ -10,6 +10,21 @@
 
 ---
 
+## Mainnet / Testnet Contract Details
+
+**Network:** Midnight Preprod (Testnet)
+**Contract Address:** `ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3`
+[View on Midnight Explorer](https://preprod.midnightexplorer.com/contracts/0xec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3)
+
+**Example Claim Transaction:** `9ea4643ffd9ebcdc1a3d45b3c8f3a789810d686c32402965ce811761da6bbc05`
+[View on 1AM Explorer](https://explorer.1am.xyz/tx/9ea4643ffd9ebcdc1a3d45b3c8f3a789810d686c32402965ce811761da6bbc05?network=preprod)
+
+### Screenshots of Contract on Block Explorers
+![Contract On-Chain](screenshots/contract-onchain.png)
+![Claim Payout](screenshots/claim-payout.png)
+
+---
+
 ## Project Description
 
 Payroll is one of the strongest arguments for using a blockchain — trustless execution, no intermediary, auditable proof that everyone got paid — and one of the worst fits for a *public* one, because every recipient's exact compensation would become permanently visible to anyone who looks.
@@ -33,20 +48,7 @@ Midnight is the natural fit because `disclose()` forces every public exposure to
 - **Nullifier-Based Claims:** Claims are executed using one-way cryptographic nullifiers, ensuring double-claiming is impossible without linking an individual's identity to a specific transaction.
 - **Income Proving:** Built-in Zero-Knowledge circuit that allows an employee to prove to a third party (e.g., a lender or auditor) that their salary is above a certain threshold, *without* revealing their exact income or doxxing their identity.
 
----
 
-## Mainnet / Testnet Contract Details
-
-**Network:** Midnight Preprod (Testnet)
-**Contract Address:** `ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3`
-[View on Midnight Explorer](https://preprod.midnightexplorer.com/contracts/0xec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3)
-
-**Example Claim Transaction:** `9ea4643ffd9ebcdc1a3d45b3c8f3a789810d686c32402965ce811761da6bbc05`
-[View on 1AM Explorer](https://explorer.1am.xyz/tx/9ea4643ffd9ebcdc1a3d45b3c8f3a789810d686c32402965ce811761da6bbc05?network=preprod)
-
-### Screenshots of Contract on Block Explorers
-![Contract On-Chain](screenshots/contract-onchain.png)
-![Claim Payout](screenshots/claim-payout.png)
 
 ---
 
