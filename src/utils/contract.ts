@@ -216,9 +216,16 @@ export async function claimPayout(input: ClaimInput): Promise<ClaimRecord> {
   });
 
   const tx = await contract.callTx.claimPayout(recipientKeyBytes, hexToBytes(periodIdHash));
+  
+  const nullifierBytes = contractPureCircuits.computeNullifier(
+    hexToBytes(periodIdHash),
+    recipientKeyBytes,
+    hexToBytes(input.holderSecret)
+  );
+
   return {
-    nullifier: bytesToHex(tx.public.nullifier),
-    claimed: tx.public.claimed,
+    nullifier: bytesToHex(nullifierBytes),
+    claimed: true,
     timestamp: Math.floor(Date.now() / 1000),
   };
 }
