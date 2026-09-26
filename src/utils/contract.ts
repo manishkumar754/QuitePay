@@ -39,7 +39,8 @@ export interface IncomeProofInput {
 
 let deployedContract: any = null;
 export let contractProviders: any = null;
-export const CONTRACT_ADDRESS = "ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3";
+export let contractPureCircuits: any = null;
+const CONTRACT_ADDRESS = "ec858b2e7ba657d3c4e0282007b5e281eb118ad3a7f4fb2779ebdc549e4a3fb3";
 
 export async function connectWallet(): Promise<WalletState> {
   const win = window as any;
@@ -132,11 +133,13 @@ async function getContract() {
   } as any;
   
   // @ts-ignore
-  const { CompiledBBoardContractContract, witnesses } = await import("@midnight-ntwrk/bboard-contract");
+  const { CompiledBBoardContractContract, witnesses, pureCircuits } = await import("@midnight-ntwrk/bboard-contract");
   // @ts-ignore
   const { CompiledContract } = await import("@midnight-ntwrk/midnight-js-protocol/compact-js");
   // @ts-ignore
   const contractWithWitnesses = CompiledContract.withWitnesses(witnesses)(CompiledBBoardContractContract);
+
+  contractPureCircuits = pureCircuits;
 
   deployedContract = await (findDeployedContract as any)(providers, {
     contractAddress: CONTRACT_ADDRESS,
@@ -157,7 +160,7 @@ export async function commitSplit(entry: SplitEntry): Promise<CommitmentRecord> 
   const contract = await getContract();
   const salt = randomHex(32);
   
-  const commitmentBytes = contract.pureCircuits.computeCommitment(BigInt(entry.amount), hexToBytes(salt));
+  const commitmentBytes = contractPureCircuits.computeCommitment(BigInt(entry.amount), hexToBytes(salt));
   const commitment = bytesToHex(commitmentBytes);
   
   await contract.callTx.commitSplit(hexToBytes(entry.recipientKey), commitmentBytes);
