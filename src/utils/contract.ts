@@ -156,9 +156,11 @@ export async function fundPool(totalAmount: number): Promise<{ poolTotal: number
 export async function commitSplit(entry: SplitEntry): Promise<CommitmentRecord> {
   const contract = await getContract();
   const salt = randomHex(32);
-  const commitment = await sha256Hex(`${entry.amount}:${salt}`);
   
-  await contract.callTx.commitSplit(hexToBytes(entry.recipientKey), hexToBytes(commitment));
+  const commitmentBytes = contract.pureCircuits.computeCommitment(BigInt(entry.amount), hexToBytes(salt));
+  const commitment = bytesToHex(commitmentBytes);
+  
+  await contract.callTx.commitSplit(hexToBytes(entry.recipientKey), commitmentBytes);
   
   return {
     recipientKey: entry.recipientKey,
