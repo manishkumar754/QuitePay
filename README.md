@@ -8,6 +8,10 @@
 - **Live MVP:** https://quite-pay-iota.vercel.app
 - **Video Demo:** [Watch the MVP Demo on Google Drive](https://drive.google.com/file/d/18OfcwmqD3VmO2GF-HplJ--C2U1YneOTs/view?usp=sharing)
 
+## Social Media Handle Links
+- **QuietPay X Profile:** [QuietPay X Profile](https://x.com/quietpayS)
+- **Launch Tweet:** [Launch Thread](https://x.com/quietpayS/status/2103888560378277949)
+
 ---
 
 ## Mainnet / Testnet Contract Details
@@ -113,14 +117,7 @@ npm run dev
 ### Usage Instructions
 See the detailed walkthrough in [`docs/USAGE.md`](docs/USAGE.md).
 
----
 
-## Social Media Handle Links
-
-- **QuietPay X Profile:** [QuietPay X Profile](https://x.com/quietpayS)
-- **Launch Tweet:** [Launch Thread](https://x.com/quietpayS/status/2103888560378277949)
-
----
 
 ## Additional Screenshots
 ### 1. QuietPay UI
