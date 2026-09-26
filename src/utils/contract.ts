@@ -45,10 +45,10 @@ export async function connectWallet(): Promise<WalletState> {
   const activeProvider = win.midnight?.["1am"] || win.midnight?.oneam || win.midnight?.mnLace;
   if (!activeProvider) throw new Error("No Midnight wallet found. Please install the Nightly/1AM wallet extension.");
 
-  const api = await activeProvider.enable();
-  const state = await api.state();
+  const api = activeProvider.connect ? await activeProvider.connect("preprod") : await activeProvider.enable();
+  const shieldedAddresses = await api.getShieldedAddresses();
 
-  return { address: state.address, network: "preprod" };
+  return { address: shieldedAddresses.shieldedAddress, network: "preprod" };
 }
 
 export async function disconnectWallet(): Promise<void> {
@@ -61,7 +61,7 @@ async function getContract() {
   const win = window as any;
   const activeProvider = win.midnight?.["1am"] || win.midnight?.oneam || win.midnight?.mnLace;
   if (!activeProvider) throw new Error("Wallet not connected");
-  const walletApi = await activeProvider.enable();
+  const walletApi = activeProvider.connect ? await activeProvider.connect("preprod") : await activeProvider.enable();
 
   const [
     { indexerPublicDataProvider },
@@ -83,6 +83,8 @@ async function getContract() {
     import("@midnight-ntwrk/midnight-js-utils")
   ]);
 
+  const shieldedAddresses = await walletApi.getShieldedAddresses();
+
   setNetworkId("preprod");
 
   const indexerHttp = "https://indexer.preprod.midnight.network/api/v4/graphql";
@@ -94,35 +96,28 @@ async function getContract() {
   const proofProvider = httpClientProofProvider(ONEAM_PROOF_SERVER, zkConfigProvider);
 
   const privateStateProvider = levelPrivateStateProvider({
-    privateStateStoreName: `quietpay-private-${walletApi.coinPublicKey.slice(0, 8)}`,
-    signingKeyStoreName: `quietpay-keys-${walletApi.coinPublicKey.slice(0, 8)}`,
+    privateStateStoreName: `quietpay-private-${shieldedAddresses.shieldedCoinPublicKey.slice(0, 8)}`,
+    signingKeyStoreName: `quietpay-keys-${shieldedAddresses.shieldedCoinPublicKey.slice(0, 8)}`,
     privateStoragePasswordProvider: () => "TempPassword123!Secure",
-    accountId: walletApi.coinPublicKey,
+    accountId: shieldedAddresses.shieldedCoinPublicKey,
   });
 
   const walletProvider = {
-    getCoinPublicKey: () => walletApi.coinPublicKey,
-    getEncryptionPublicKey: () => walletApi.coinPublicKey,
+    getCoinPublicKey: () => shieldedAddresses.shieldedCoinPublicKey,
+    getEncryptionPublicKey: () => shieldedAddresses.shieldedEncryptionPublicKey,
     balanceTx: async (tx: any): Promise<any> => {
       const serializedTx = toHex(tx.serialize());
-      if (typeof activeProvider.balanceUnsealedTransaction === "function") {
-        const received = await activeProvider.balanceUnsealedTransaction(serializedTx);
-        return Transaction.deserialize("signature", "proof", "binding", fromHex(received.tx)) as any;
-      }
-      throw new Error("Wallet does not support balanceUnsealedTransaction");
+      const received = await walletApi.balanceUnsealedTransaction(serializedTx);
+      return Transaction.deserialize("signature", "proof", "binding", fromHex(received.tx)) as any;
     },
-    proveTx: async (tx: any): Promise<any> => {
-      const serializedTx = toHex(tx.serialize());
-      if (typeof activeProvider.proveUnsealedTransaction === "function") {
-        const received = await activeProvider.proveUnsealedTransaction(serializedTx);
-        return Transaction.deserialize("signature", "proof", "binding", fromHex(received.tx)) as any;
-      }
-      throw new Error("Wallet does not support proveUnsealedTransaction");
-    },
+  } as any;
+
+  const midnightProvider = {
     submitTx: async (tx: any): Promise<string> => {
       const serializedTx = toHex(tx.serialize());
-      const txHash = await activeProvider.submitTransaction(serializedTx);
-      return txHash;
+      await walletApi.submitTransaction(serializedTx);
+      const txIdentifiers = tx.identifiers();
+      return txIdentifiers[0];
     }
   } as any;
 
@@ -132,7 +127,7 @@ async function getContract() {
     zkConfigProvider,
     proofProvider,
     walletProvider,
-    midnightProvider: walletProvider,
+    midnightProvider,
   } as any;
   
   // @ts-ignore
