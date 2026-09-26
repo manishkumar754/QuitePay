@@ -1,72 +1,43 @@
 # How to Use QuietPay
 
 ## What You Need
-
-- A Midnight-compatible wallet (e.g. Lace with the Midnight preview
-  extension) set to **Preprod**.
-- Some test tokens on Preprod to cover transaction fees.
-- A modern browser — no other software required to *use* the deployed app.
+- The **Midnight Lace Wallet Extension** connected to the Preprod network.
+- Some **testnet tNIGHT tokens** to pay for transaction fees.
+- Access to the QuietPay web app.
 
 ## Step-by-Step Guide
 
-### If you're the payer
+### For Payers (Funding and Committing)
+1. **Connect Wallet:** Click "Connect Wallet" at the top right of the app.
+2. **Fund Pool:** In the Payer panel, enter the total payroll amount for the period (e.g. 5000) and click "Fund Pool". This publishes the total amount to the public ledger so your solvency is auditable. Approve the transaction in your wallet.
+3. **Commit Splits:** For each recipient you want to pay:
+   - Enter their Recipient Key (a 64-character hex string they provide to you).
+   - Enter their specific Amount.
+   - Click "Publish commitment".
+   - Approve the transaction in your wallet. 
+   - A random salt will be generated and mixed with the amount. Provide this salt, the amount, and the recipient key back to the recipient so they can claim it.
 
-1. **Open the app** and connect your wallet.
-2. **Fund the pool.** Enter the total amount for this pay period and click
-   "Fund pool." This total becomes public — it's how anyone can confirm
-   the pool was fully funded.
-3. **Commit each recipient's split.** For every recipient, enter a label
-   (for your own reference only — never sent on-chain), an opaque
-   recipient key, and their real amount. Click "Publish commitment." The
-   amount is hashed with a random salt locally; only the hash is
-   published.
-4. **Share the details privately.** Off-chain (Signal, email, whatever your
-   org already uses), send each recipient their recipient key, amount, and
-   salt so they can claim.
+### For Recipients (Claiming Payouts)
+1. **Connect Wallet:** Click "Connect Wallet" at the top right of the app.
+2. **Enter Details:** In the Recipient panel, ensure you are on the "Claim" tab.
+   - **Your recipient key:** The 64-character hex string you gave the payer.
+   - **Your amount:** The amount the payer committed for you.
+   - **Salt from your payer:** The 64-character hex string the payer provided to you.
+   - **Pay period ID:** The ID for this pay cycle (e.g. 2026-09).
+   - **Holder secret:** A random secret you keep to secure your claim.
+3. **Submit Claim:** Click "Claim payout" and approve the transaction in your wallet. The smart contract will silently verify your details using zero-knowledge proofs and mark your allocation as claimed.
 
-### If you're a recipient
-
-1. **Open the app** and connect your wallet.
-2. **Switch to "Claim."** Enter the recipient key, amount, and salt your
-   payer gave you, plus the pay period ID and a holder secret (keep this
-   secret — it's what lets you claim again next period without linking
-   the two claims together).
-3. **Click "Claim payout."** The app checks that your amount and salt
-   match the published commitment, then submits a claim. The public
-   ledger updates with a nullifier and a "Claimed" badge — nothing else.
-4. **To prove your income to someone else** (a lender, a landlord), switch
-   to "Prove income," enter the same recipient key/amount/salt plus the
-   threshold they're asking about, and click "Generate income proof."
-   Nothing is written on-chain — you get a pass/fail result to share
-   however you choose.
+### Proving Income
+1. **Switch to Prove Income:** In the Recipient panel, click the "Prove income" tab.
+2. **Enter Details:** Provide your recipient key, amount, salt, and the threshold you want to prove (e.g. proving you earned at least 2000).
+3. **Generate Proof:** Click "Generate income proof". This happens entirely off-chain and reveals nothing but "Yes, the amount is above this threshold" to the verifier.
 
 ## What Gets Proved (and What Stays Private)
-
-| | |
-|---|---|
-| **Proved publicly** | The pool was funded with a specific total; a specific commitment was published for a recipient key; a valid, unclaimed entitlement was claimed. |
-| **Stays private** | Every recipient's actual amount, the salt behind each commitment, and (for income proofs) the threshold comparison result stays between the recipient and whoever they share the proof with. |
-| **Written on-chain** | Pool total, per-recipient commitment hashes, and claim nullifiers + a claimed boolean. |
+- **Public:** The total pool amount, a random hashed commitment of each recipient's payout, and a one-way nullifier showing a claim happened.
+- **Private:** The exact amount each recipient gets, their salt, and their personal identity.
+- **The Proof:** You prove mathematically that your private (amount + salt) matches the public commitment hash *without* revealing the amount.
 
 ## Troubleshooting
-
-**"Pool total must be greater than zero"**
-Enter a positive number before clicking "Fund pool."
-
-**"Amount/salt do not match the published commitment"** *(shown by the
-contract once compiled — the local demo mirrors this as a claim failure)*
-Double-check you entered the exact amount and salt your payer sent you —
-even a small mismatch produces a completely different hash.
-
-**"Nothing to claim — amount must be greater than zero"**
-The amount field was zero or blank. Enter the real amount your payer
-committed for you.
-
-**Wallet won't connect**
-Confirm your wallet extension is set to the **Preprod** network — this
-contract is deployed on Preprod for Level 4.
-
-**My income proof says "failed" but I know I was paid enough**
-Check that the threshold you entered is actually lower than or equal to
-your amount — the proof checks `amount >= threshold`, so entering a higher
-number than your real amount will correctly fail.
+- **"amount/salt do not match the published commitment"**: Wait 15-20 seconds after the payer publishes the commitment to give the network indexer time to catch up, then try again.
+- **"Network error: Response body loading was aborted"**: Your internet connection dropped while downloading the WebAssembly prover file. Refresh the page and try again.
+- **Stuck on "Submitting claim..."**: Check your browser extensions — the Midnight Wallet popup might be hidden or waiting for your approval in the background!

@@ -1,12 +1,12 @@
 # QuietPay
 
-![CI](https://github.com/YOUR_GITHUB_USERNAME/quietpay/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/manishkumar754/QuitePay/actions/workflows/deploy.yml/badge.svg)
 
 > Pay everyone. Reveal to no one.
 
 ## Live Demo
 
-[Preprod demo URL — add after deploying the frontend to Vercel/Netlify]
+https://quite-pay-iota.vercel.app
 
 ## Contract Address
 
