@@ -161,10 +161,21 @@ export async function commitSplit(entry: SplitEntry): Promise<CommitmentRecord> 
   const contract = await getContract();
   const salt = randomHex(32);
   
-  const commitmentBytes = contractPureCircuits.computeCommitment(BigInt(entry.amount), hexToBytes(salt));
+  const amountBigInt = BigInt(entry.amount);
+  const saltBytes = hexToBytes(salt);
+  const recipientKeyBytes = hexToBytes(entry.recipientKey);
+
+  console.log("=== DEBUG COMMIT SPLIT ===");
+  console.log("entry amount:", entry.amount, "-> BigInt:", amountBigInt);
+  console.log("generated salt:", salt);
+  console.log("entry recipientKey:", entry.recipientKey);
+
+  const commitmentBytes = contractPureCircuits.computeCommitment(amountBigInt, saltBytes);
   const commitment = bytesToHex(commitmentBytes);
   
-  await contract.callTx.commitSplit(hexToBytes(entry.recipientKey), commitmentBytes);
+  console.log("commitment computed:", commitment);
+
+  await contract.callTx.commitSplit(recipientKeyBytes, commitmentBytes);
   
   return {
     recipientKey: entry.recipientKey,
@@ -182,13 +193,29 @@ export async function claimPayout(input: ClaimInput): Promise<ClaimRecord> {
   const contract = await getContract();
   const periodIdHash = await sha256Hex(input.periodId);
 
+  const amountBigInt = BigInt(input.amount);
+  const saltBytes = hexToBytes(input.salt);
+  const recipientKeyBytes = hexToBytes(input.recipientKey);
+
+  console.log("=== DEBUG CLAIM PAYOUT ===");
+  console.log("input amount:", input.amount, "-> BigInt:", amountBigInt);
+  console.log("input salt:", input.salt);
+  console.log("input recipientKey:", input.recipientKey);
+  
+  try {
+    const computedLeaf = contractPureCircuits.computeCommitment(amountBigInt, saltBytes);
+    console.log("re-computed leaf offline:", bytesToHex(computedLeaf));
+  } catch (e) {
+    console.error("Error computing leaf offline:", e);
+  }
+
   await contractProviders.privateStateProvider.set(CONTRACT_ADDRESS, {
-    amount: BigInt(input.amount),
-    salt: hexToBytes(input.salt),
+    amount: amountBigInt,
+    salt: saltBytes,
     holderSecret: hexToBytes(input.holderSecret),
   });
 
-  const tx = await contract.callTx.claimPayout(hexToBytes(input.recipientKey), hexToBytes(periodIdHash));
+  const tx = await contract.callTx.claimPayout(recipientKeyBytes, hexToBytes(periodIdHash));
   return {
     nullifier: bytesToHex(tx.public.nullifier),
     claimed: tx.public.claimed,
