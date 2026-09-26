@@ -215,7 +215,7 @@ export async function claimPayout(input: ClaimInput): Promise<ClaimRecord> {
     holderSecret: hexToBytes(input.holderSecret),
   });
 
-  const tx = await contract.callTx.claimPayout(recipientKeyBytes, hexToBytes(periodIdHash));
+  await contract.callTx.claimPayout(recipientKeyBytes, hexToBytes(periodIdHash));
   
   const nullifierBytes = contractPureCircuits.computeNullifier(
     hexToBytes(periodIdHash),
