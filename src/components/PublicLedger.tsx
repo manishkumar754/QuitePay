@@ -50,6 +50,11 @@ export function PublicLedger({
                   <p className="font-mono text-[11px] text-text-low truncate">
                     key {c.recipientKey.slice(0, 14)}…
                   </p>
+                  {c.salt && (
+                    <p className="font-mono text-[11px] text-amber-500 truncate">
+                      salt {c.salt}
+                    </p>
+                  )}
                 </div>
                 <span className="shrink-0 font-mono text-[11px] text-patina-400">
                   {c.commitment.slice(0, 10)}…

@@ -13,6 +13,7 @@ export interface CommitmentRecord {
   recipientKey: string;
   recipientLabel: string;
   commitment: string;
+  salt?: string;
 }
 
 export interface ClaimInput {
@@ -162,6 +163,7 @@ export async function commitSplit(entry: SplitEntry): Promise<CommitmentRecord> 
     recipientKey: entry.recipientKey,
     recipientLabel: entry.recipientLabel,
     commitment,
+    salt,
   };
 }
 
