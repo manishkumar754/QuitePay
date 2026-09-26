@@ -10,8 +10,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), wasm()],
   resolve: {
     alias: {
-      "isomorphic-ws": path.resolve(__dirname, "mock-ws.js"),
-      "@midnight-ntwrk/bboard-contract": path.resolve(__dirname, "preprod-deployment/contracts/src/index.ts"),
+      "isomorphic-ws": path.resolve(import.meta.dirname, "browser-ws-polyfill.js"),
+      "@midnight-ntwrk/bboard-contract": path.resolve(import.meta.dirname, "preprod-deployment/contracts/src/index.ts"),
       "events": "events",
       "assert": "assert",
       "buffer": "buffer"
